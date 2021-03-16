@@ -20,11 +20,11 @@ export class ServiceCustomerOrderService {
   }  
 
   getCustomerOrder(id:number , inicialFecha: Date , finalFecha:Date): Observable<any> {
-    return this.http.get(`http://localhost:8089/api/beitech/order/idCustomer=1/initialDate=2021-01-14/finalDate=2021-01-23`);
+    return this.http.get(`${baseUrl}/order/idCustomer=${id}/initialDate=${inicialFecha}/finalDate=${finalFecha}`);
   }
 
-  getOrderDetail(id:number): Observable<any> {
-    return this.http.get(`http://localhost:8089/api/beitech/order/detail/675`);
+  getCustomerAll(): Observable<any> {
+    return this.http.get(`${baseUrl}/customer/all`);
   }
 
  handleError(error:any) {

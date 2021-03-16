@@ -1,33 +1,44 @@
-<p>You can bind our <code>NgbPagination</code> component with slicing the data list</p>
-<table class="table table-striped">
-  <thead>
-  <tr>
-    <th scope="col">Creation Date</th>
-    <th scope="col">Order ID</th>
-    <th scope="col">Total $</th>
-    <th scope="col">Delivery Address</th>
-	<th scope="col">Products</th>
-  </tr>
-  </thead>
-  <tbody>
-	  <tr *ngFor="let modelOrder of listModelCustomerOrder">
-	  <td>{{modelOrder.idOrder.creationDate}}</td>
-	  <td>{{modelOrder.idOrder.orderId}}</td>
-	  <td>{{modelOrder.idOrder.total}}</td>
-    <td>{{modelOrder.idOrder.deliveryAddress}}</td>
-	  <td *ngFor="let product of modelOrder.listProduct">{{product}}</td>
-    </tr> 
-  </tbody>
-</table>
+<header>
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <label class="input-group-text" for="inputGroupSelect01">Customers 🧔</label>
+    </div>
+    <select class="custom-select" id="inputGroupSelect01" [(ngModel)]="opcionSeleccionado" (change)="getOrderCustomer()">
+         <option *ngFor="let modelCustomer of listModelCustomer" [ngValue]="modelCustomer.customerId">{{modelCustomer.name}}</option> 
+    </select>
+  </div>
+</header>
+<section>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th scope="col">Creation Date</th>
+      <th scope="col">Order ID</th>
+      <th scope="col">Total $</th>
+      <th scope="col">Delivery Address</th>
+    <th scope="col">Products</th>
+    </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let modelOrderCustomerProduct of listModelOrderCustomerProduct | slice: (page-1) * pageSize : page * pageSize">
+      <td>{{modelOrderCustomerProduct.creationDate}}</td>
+      <td>{{modelOrderCustomerProduct.orderId}}</td>
+      <td>{{modelOrderCustomerProduct.total}}</td>
+      <td>{{modelOrderCustomerProduct.deliveryAddress}}</td>
+      <td *ngIf="modelOrderCustomerProduct.listProductDetailString.length == 0; else noAccessTypes"></td>
+      <ng-template #noAccessTypes>
+          <td>
+            <p  *ngFor="let product of modelOrderCustomerProduct.listProductDetailString">
+            {{product}}
+            </p>
+          </td>
+        </ng-template>
+      </tr> 
+    </tbody>
+  </table>
+  <ngb-pagination
+[(page)]="page"
+[pageSize]="pageSize"
+[collectionSize]="listModelOrderCustomerProduct.length"></ngb-pagination>
+</section>
 
-
- <!--<div class="d-flex justify-content-between p-2">
-  <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize" (pageChange)="refreshCountries()">
-  </ngb-pagination>
-
-  <select class="custom-select" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="refreshCountries()">
-    <option [ngValue]="2">2 items per page</option>
-    <option [ngValue]="4">4 items per page</option>
-    <option [ngValue]="6">6 items per page</option>
-  </select>
-</div>--> 

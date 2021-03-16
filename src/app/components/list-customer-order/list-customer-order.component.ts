@@ -1,15 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ModelOrder } from 'src/app/models/model-order.model';
-import { ModelOrderDetail } from 'src/app/models/model-order-detail.model';
-import { ModelCustomerOrder } from 'src/app/models/model-customer-order.model';
-import { ModelProduct } from 'src/app/models/model-product.model';
+import { ModelOrderCustomerProduct } from 'src/app/models/model-order-customer-product';
+import { ModelCustomer } from 'src/app/models/model-customer.model';
 import { ServiceCustomerOrderService } from 'src/app/services/service-customer-order.service';
 import { DatePipe } from '@angular/common'
 
 
-var incial: Date;
-var final: Date;
 
 @Component({
   selector: 'app-list-customer-order',
@@ -18,46 +14,41 @@ var final: Date;
 })
 export class ListCustomerOrderComponent implements OnInit {
 
-  listModelOrder: ModelOrder[] = [];
-  listModelOrderDetail: ModelOrderDetail[] = [];
-  listModelCustomerOrder : ModelCustomerOrder[] = [];
+  page = 1;
+  pageSize =20;
 
+  listModelOrderCustomerProduct: ModelOrderCustomerProduct[] = [];
+  listModelCustomer: ModelCustomer[] = [];
+  opcionSeleccionado: number;
 
   constructor(private ServiceCustomerOrderService: ServiceCustomerOrderService, public actRoute: ActivatedRoute,
     public router: Router, public datepipe: DatePipe) { }
 
   ngOnInit(): void {
-    this.getOrderCustomer();
+    this.getAllCustomer();
   }
 
   getOrderCustomer() {
-    this.ServiceCustomerOrderService.getCustomerOrder(1,incial,final).subscribe(data => {
-      data.forEach(element =>{
-        let modelCustomerOrder;
-          this.listModelCustomerOrder.push( modelCustomerOrder = {
-            idOrder: element,
-            listProduct:this.getOrderCustomerDetail(element.orderId)
-          })
-       });
-       console.log(this.listModelCustomerOrder);
+
+    const formatYmd = date => date.toISOString().slice(0, 10);
+    let incial :Date = new Date();
+    incial.setMonth(incial.getMonth() -1 );
+    incial = formatYmd(incial);
+    const final: Date = formatYmd(new Date);
+
+    this.ServiceCustomerOrderService.getCustomerOrder(this.opcionSeleccionado,incial,final).subscribe(data => {
+      this.listModelOrderCustomerProduct = data
+      this.listModelOrderCustomerProduct.forEach(x =>{ x.listProductDetailString = []; 
+        x.listProductDetail.map(data => {
+        const {productDescription, quantity} = data;
+        x.listProductDetailString.push( `${productDescription} x ${quantity}`);
+      })});
     });
   }
 
-  getOrderCustomerDetail(idOrder  : ModelOrder) {
-  
-    let listProduc : string[]=[];
-    
-    this.ServiceCustomerOrderService.getOrderDetail(idOrder.orderId).subscribe(data => {
-      data.forEach(element =>{
-        let product = `${element.quantity} x ${element.productDescription}`;
-        listProduc.push(product);
-      });
+  getAllCustomer() {
+    this.ServiceCustomerOrderService.getCustomerAll().subscribe(data => {
+      this.listModelCustomer = data
     });
-
-    return listProduc;
-
   }
-
-
-
 }
